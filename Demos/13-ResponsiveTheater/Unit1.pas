@@ -55,9 +55,9 @@ begin
     Bitmap.Canvas.Font.Size := 18;
     Bitmap.Canvas.Font.Color := clWhite;
     Bitmap.Canvas.Brush.Style := bsClear;
-    Bitmap.Canvas.TextOut(24, 20, 'Mondo virtuale: 1600 x 900');
-    Bitmap.Canvas.TextOut(24, Bitmap.Height - 52, 'Angolo (0, 900)');
-    Bitmap.Canvas.TextOut(Bitmap.Width - 190, 20, 'Angolo (1600, 0)');
+    Bitmap.Canvas.TextOut(24, 20, 'Virtual world: 1600 x 900');
+    Bitmap.Canvas.TextOut(24, Bitmap.Height - 52, 'Corner (0, 900)');
+    Bitmap.Canvas.TextOut(Bitmap.Width - 190, 20, 'Corner (1600, 0)');
     BackgroundEngine.CreateSprite(Bitmap, 'background', 1, 1, 0,
       Bitmap.Width div 2, Bitmap.Height div 2, False, 0).HitTest := False;
   finally
@@ -85,7 +85,7 @@ begin
     Bitmap.Canvas.Font.Color := clWhite;
     Bitmap.Canvas.Brush.Style := bsClear;
     Bitmap.Canvas.TextOut(12, 12, AGuid);
-    S := Format('centro: %d, %d', [X, Y]);
+    S := Format('center: %d, %d', [X, Y]);
     Bitmap.Canvas.TextOut(12, 40, S);
     TargetEngine.CreateSprite(Bitmap, AGuid, 1, 1, 0, X, Y, False, 1).HitTest := True;
   finally
@@ -103,9 +103,9 @@ begin
   Theater1.KeepViewCenterOnResize := True;
 
   AddBackground;
-  AddTarget('Bersaglio A', 260, 210, clMaroon);
-  AddTarget('Bersaglio B', 800, 450, clGreen);
-  AddTarget('Bersaglio C', 1340, 690, clNavy);
+  AddTarget('Target A', 260, 210, clMaroon);
+  AddTarget('Target B', 800, 450, clGreen);
+  AddTarget('Target C', 1340, 690, clNavy);
 
   Theater1.CenterTheater;
   Theater1.Active := True;
@@ -124,7 +124,7 @@ var
 begin
   GetCursorPos(P);
   P := Theater1.ScreenToClient(P);
-  MouseLabel.Caption := Format('CLICK %s - client (%d, %d), virtuale (%d, %d)',
+  MouseLabel.Caption := Format('CLICK %s - client (%d, %d), virtual (%d, %d)',
     [ASprite.Guid, P.X, P.Y, Theater1.XVisibleToVirtual(P.X),
      Theater1.YVisibleToVirtual(P.Y)]);
 end;
@@ -133,14 +133,14 @@ procedure TForm1.Theater1MouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   if Button = mbLeft then
-    MouseLabel.Caption := Format('CLICK sfondo - client (%d, %d), virtuale (%d, %d)',
+    MouseLabel.Caption := Format('BACKGROUND CLICK - client (%d, %d), virtual (%d, %d)',
       [X, Y, Theater1.XVisibleToVirtual(X), Theater1.YVisibleToVirtual(Y)]);
 end;
 
 procedure TForm1.Theater1TheaterMouseMove(Sender: TObject; VisibleX,
   VisibleY, VirtualX, VirtualY: Integer; Shift: TShiftState);
 begin
-  MouseLabel.Caption := Format('Mouse - client (%d, %d), virtuale (%d, %d)',
+  MouseLabel.Caption := Format('Mouse - client (%d, %d), virtual (%d, %d)',
     [VisibleX, VisibleY, VirtualX, VirtualY]);
 end;
 
@@ -149,7 +149,7 @@ begin
   if not Assigned(Theater1) then
     Exit;
   SizeLabel.Caption := Format(
-    'Theater: %d x %d   Mondo: %d x %d   View: %d, %d   Zoom: %.0f%%',
+    'Theater: %d x %d   World: %d x %d   View: %d, %d   Zoom: %.0f%%',
     [Theater1.ClientWidth, Theater1.ClientHeight, Theater1.VirtualWidth,
      Theater1.VirtualHeight, Theater1.ViewX, Theater1.ViewY, Theater1.Zoom]);
 end;

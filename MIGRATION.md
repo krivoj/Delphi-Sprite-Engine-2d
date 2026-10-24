@@ -13,8 +13,8 @@ Delphi 10 Seattle (CompilerVersion 30.0) or newer.
 | `SE_Bitmap` | `TSpriteBitmap` |
 | `SE_SubSprite` | `TSubSprite` |
 | `SE_SpriteLabel` | `TSpriteLabel` |
-| `SE_SpriteProgressBar` | `TSpriteProgressBar` |
-| `SE_SpritePolygon` | `TSpritePolygon` |
+| `SE_SpriteProgressBar` | `TSpriteProgressBar` (`SpriteEngine.Controls`) |
+| `SE_SpritePolygon` | `TSpritePolygon` (`SpriteEngine.Controls`) |
 | `SE_ThreadTimer` | `TThreadTimer` |
 | `SE_Panel` | `TSpritePanel` |
 
@@ -32,7 +32,7 @@ values use a short lowercase prefix such as `bmNormal`.
 | `DSE_list` | `SpriteEngine.Collections` |
 | `DSE_misc` | `SpriteEngine.Utils` |
 | `DSE_threadtimer` | `SpriteEngine.Timer` |
-| `DSE_Panel` | `SpriteEngine.Panel` |
+| `DSE_Panel` | Removed; use `TSpritePanel` from `SpriteEngine.Controls` |
 | `DSE_PathPlanner` | `SpriteEngine.PathPlanner` |
 | `DSE_SearchFiles` | `SpriteEngine.FileSearch` |
 | `DSE_Random` | `SpriteEngine.Random` |

@@ -1,7 +1,7 @@
 object Form1: TForm1
   Left = 0
   Top = 0
-  Caption = 'SE-ProgressBar'
+  Caption = 'Sprite Engine Controls - Progress Bar'
   ClientHeight = 722
   ClientWidth = 1032
   Color = clBtnFace

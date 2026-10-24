@@ -6,6 +6,9 @@
         <Projects Include="SpriteEngine.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="SpriteEngine.Controls.dproj">
+            <Dependencies>SpriteEngine.dproj</Dependencies>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -23,14 +26,23 @@
     <Target Name="SpriteEngine:Make">
         <MSBuild Projects="SpriteEngine.dproj" Targets="Make"/>
     </Target>
+    <Target Name="SpriteEngineControls">
+        <MSBuild Projects="SpriteEngine.Controls.dproj"/>
+    </Target>
+    <Target Name="SpriteEngineControls:Clean">
+        <MSBuild Projects="SpriteEngine.Controls.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SpriteEngineControls:Make">
+        <MSBuild Projects="SpriteEngine.Controls.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="SpriteEngine"/>
+        <CallTarget Targets="SpriteEngine;SpriteEngineControls"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="SpriteEngine:Clean"/>
+        <CallTarget Targets="SpriteEngineControls:Clean;SpriteEngine:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="SpriteEngine:Make"/>
+        <CallTarget Targets="SpriteEngine:Make;SpriteEngineControls:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

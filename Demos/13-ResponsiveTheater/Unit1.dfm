@@ -1,7 +1,7 @@
 object Form1: TForm1
   Left = 0
   Top = 0
-  Caption = 'Sprite Engine - Theater responsive'
+  Caption = 'Sprite Engine - Responsive Theater'
   ClientHeight = 690
   ClientWidth = 1080
   Color = clBtnFace
@@ -31,21 +31,21 @@ object Form1: TForm1
       Top = 8
       Width = 56
       Height = 13
-      Caption = 'Dimensioni'
+      Caption = 'Dimensions'
     end
     object MouseLabel: TLabel
       Left = 12
       Top = 29
       Width = 98
       Height = 13
-      Caption = 'Sposta qui il mouse'
+      Caption = 'Move the mouse here'
     end
     object HelpLabel: TLabel
       Left = 12
       Top = 50
       Width = 566
       Height = 13
-      Caption = 'Ridimensiona o massimizza la finestra. Rotella = zoom, trascinamento = pan, click sui bersagli = test coordinate.'
+      Caption = 'Resize or maximize the window. Mouse wheel = zoom, drag = pan, click a target = coordinate test.'
     end
   end
   object Theater1: TTheater

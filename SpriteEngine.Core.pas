@@ -11,8 +11,6 @@ type
   TTheater = class;
   TSpriteEngine =  class;
   TSprite = class;
-  TSpriteProgressBar = class;
-  TSpritePolygon = class;
 
 
   TTheaterRenderEvent = procedure( Sender: TObject; VirtualBitmap, VisibleBitmap: TSpriteBitmap ) of object;
@@ -170,8 +168,8 @@ type
     f100DivZoom: double;   // 100/fZoom
 
     fOffsetX, fOffsetY: integer;  // Offset del VisibleBitmap sul VirtualBitmap
-    fPaintWidth, fPaintHeight: integer;  // una immagine molto zoomata OUT può divenire molto piccola.
-    ZoomWidth, ZoomHeight: integer;  // una immagine molto zoomata IN può divenire virtualmente enorme
+    fPaintWidth, fPaintHeight: integer;  // A heavily zoomed-out image can become very small.
+    ZoomWidth, ZoomHeight: integer;  // A heavily zoomed-in image can become virtually enormous.
 
     fLastMouseMoveX, fLastMouseMoveY: integer;  // coordinate reali del Bitmap
     fMouseDownX, fMouseDownY: integer;  // coordinate del mouse effettive come fosse una Form
@@ -441,9 +439,6 @@ type
     function CreateSprite( const FileName,Guid: string; nFramesX, nFramesY, nDelay, posX, posY: integer; const Transparent: boolean; const aPriority: integer ): TSprite;overload;
     function CreateSprite(const bmp: TBitmap; const Guid: string; nFramesX, nFramesY, nDelay, posX, posY: integer; const Transparent: boolean; const aPriority: integer  ): TSprite; overload;
     procedure AddSprite(aSprite: TSprite) ;
-    function CreateSpriteProgressBar(const Guid: string; posX, posY, Width,Height: integer; aFontName: string;
-     aFontColor, aBarColor, aBackColor: TColor; aFontSize: Integer; aText: string; aValue: integer; aTransparent: boolean; aPriority: integer ): TSpriteProgressBar;
-    function CreateSpritePolygon(const Guid: string; posX, posY, VertexColor, FillColor: Integer; Vertices: string; Filled: Boolean; Priority: Integer): TSpritePolygon;
     function CreateLblSprite(const aText:string; const Guid: string; posX, posY: integer;
                              const FontName: string; const FontStyle :TFontStyles; const FontSize: Integer; const FontColor: TColor;
                              const BackColor: TColor; const Alignment: Integer; BkMode: Integer; aTransColor: Integer; ForceTrans:boolean;
@@ -487,9 +482,6 @@ type
 
   TSprite = class( TObject )
   private
-
-    ProgressBar : Boolean;
-    Polygon : Boolean;
     FBMP, FBMPalpha: TSpriteBitmap;
     FBMPCurrentFrame,FBMPCurrentFrameAlpha: TSpriteBitmap;
     fchangingFrame: boolean;
@@ -696,42 +688,6 @@ type
     property OnDestinationreachedPer : TSpriteDestinationReachedEvent read FOnDestinationreachedPerc write FOnDestinationreachedPerc;
     property OnPartialMoveReached : TSpritePartialMoveEvent read FOnPartialMoveReached write FOnPartialMoveReached;
 
-
-  end;
-
-  TSpriteProgressBar = class (TSprite)
-  private
-  protected
-  public
-//    Guid: string;
-    Text : String;
-    Value : Integer; // percentuale
-    BarColor: TColor;
-    BackColor: TColor;
-    pbHAlignment,pbVAlignment: Integer;
-    lFontName: string;
-    lFontStyle : TFontStyles;
-    lFontSize: Integer;
-    lFontColor: TColor;
-    lFontQuality : TFontQuality;
- // aggiorna il bmp interno ogni volta con fillrect
-  constructor create ( const guid: string; x,y,w,h: integer; aFontName: string; aFontColor, aBarColor, aBackColor: TColor; aFontSize: Integer; aText: string; aValue: integer; aTransparent: boolean );
-  destructor destroy; override;
-  end;
-
-  TSpritePolygon = class (TSprite)
-  private
-    oldAngle: Single;
-    arPoint, arPointOriginal, arPointVisual : array of Tpoint;
-  function GetSizeFromPolygon: TRect;
-  protected
-  public
-    VertexColor : TColor;
-    FillColor : TColor;
-    Filled : Boolean;
-  constructor create ( const guid: string; x,y, VertexColor,FillColor: integer; Vertices: string; Filled: boolean; Priority: integer );
-  destructor destroy; override;
-  procedure Rotate(Degrees: integer);
 
   end;
 
@@ -1354,47 +1310,6 @@ begin
   aSprite.Visible := true;
   Result:= aSprite;
 end;
-function TSpriteEngine.CreateSpriteProgressBar(const Guid: string; posX, posY, Width,Height: integer; aFontName: string;
-   aFontColor, aBarColor, aBackColor: TColor; aFontSize: Integer; aText: string; aValue: integer; aTransparent: boolean; aPriority:integer ): TSpriteProgressBar;
-var
-aSpriteProgressBar: TSpriteProgressBar;
-begin
-
-  aSpriteProgressBar:= TSpriteProgressBar.Create ( Guid, posX, posY, Width,Height, aFontName,aFontColor, aBarColor, aBackColor, aFontSize, aText,aValue, aTransparent) ;
-  aSpriteProgressBar.Theater := FTheater;
-  aSpriteProgressBar.FEngine := self;
-  aSpriteProgressBar.OnDestinationreached := aSpriteProgressBar.iOnDestinationReached ;// aSpriteReachdestination;
-  aSpriteProgressBar.Guid := Guid;
-  aSpriteProgressBar.Priority := aPriority;
-  aSpriteProgressBar.Value:= aValue;
-  aSpriteProgressBar.BackColor := aBackColor;
-  aSpriteProgressBar.pbHAlignment := DT_CENTER;
-  aSpriteProgressBar.pbVAlignment := DT_VCENTER;
-//  if (posX >= 0) and (posY >=0) then aSprite.Position :=  Point(posX,posY);
-
-  lstSprites.Add( aSpriteProgressBar );
-  aSpriteProgressBar.Visible := true;
-  aSpriteProgressBar.Transparent := False;
-  Result:= aSpriteProgressBar;
-end;
-function TSpriteEngine.CreateSpritePolygon(const Guid: string; posX, posY, VertexColor, FillColor: Integer; Vertices: string; Filled: Boolean; Priority: Integer): TSpritePolygon;
-var
-aSpritePoly: TSpritePolygon;
-begin
-
-  aSpritePoly:= TSpritePolygon.Create ( Guid, posX, posY, VertexColor, FillColor, Vertices, Filled , Priority ) ;
-  aSpritePoly.Theater := FTheater;
-  aSpritePoly.FEngine := self;
-  aSpritePoly.OnDestinationreached := aSpritePoly.iOnDestinationReached ;// aSpriteReachdestination;
-  aSpritePoly.Guid := Guid;
-  aSpritePoly.Priority := Priority;
-
-  lstSprites.Add( aSpritePoly );
-  aSpritePoly.Visible := true;
-  aSpritePoly.Transparent := true;
-  Result:= aSpritePoly;
-
-end;
 function TSpriteEngine.CreateLblTooltipSprite(const aText:string; const Guid: string; posX, posY: integer;
                              const FontName: string; const FontStyle :TFontStyles; const FontSize: Integer; const FontColor: TColor;
                              const BackColor: TColor; const Alignment: integer; BkMode: Integer; aTransColor: Integer; ForceTrans:boolean;
@@ -1613,7 +1528,7 @@ begin
                 end;
                 }
 
-                // qui sotto va come concetto ma non è performante.controllare sotto l'albero e poi ha smnesso di andare-
+                // The approach below is conceptually valid but not performant.
 
                  L:=lstSprites[k].DrawingRect.Left;
                  T:=lstSprites[k].DrawingRect.Top;
@@ -1991,7 +1906,7 @@ begin
     FPositionY:= posY;
   end;
 
-  //glielo devo passare già tagliato e poi andrà bene
+  // Pass the bitmap already cropped to the required frame.
     with rectSource do begin
       Left := 0;
       Top := 0;
@@ -2046,12 +1961,12 @@ begin
   FBMPCurrentFramealpha :=  TSpriteBitmap.Create(FBMPCurrentFrame.Width,FBMPCurrentFrame.Height);   // crea un bmp alpha comunque
 
 
-  if FrameX > (FFrameXMax-1) then // lo resetta solo c'è un frame in più
+  if FrameX > (FFrameXMax-1) then // Reset only when the frame is outside the valid range.
     FrameX := 0;
 //  FrameX := 0;
   FrameY := 0;
 
-  //glielo devo passare già tagliato e poi andrà bene
+  // Pass the bitmap already cropped to the required frame.
     with rectSource do
     begin
       Left := 0;
@@ -2110,7 +2025,7 @@ begin
   fBmp.fbitmapAlpha := FBMPalpha.Bitmap ;
   fBmpCurrentFrame.fbitmapAlpha := FBMPCurrentFrameAlpha.Bitmap ;
 
-  //glielo devo passare già tagliato e poi andrà bene
+  // Pass the bitmap already cropped to the required frame.
     with rectSource do
     begin
       Left := 0;
@@ -2166,11 +2081,11 @@ begin
   FBMPCurrentFramealpha :=  TSpriteBitmap.Create(FBMPCurrentFrame.Width,FBMPCurrentFrame.Height);   // crea un bmp alpha comunque
 
 
-  if FrameX > (FFrameXMax-1) then // lo resetta solo c'è un frame in più
+  if FrameX > (FFrameXMax-1) then // Reset only when the frame is outside the valid range.
     FrameX := 0;
   FrameY := 0;
 
-  //glielo devo passare già tagliato e poi andrà bene
+  // Pass the bitmap already cropped to the required frame.
     with rectSource do begin
       Left := 0;
       Top := 0;
@@ -2358,7 +2273,7 @@ begin
       if ( PositionX <> oldx ) or ( PositionY <> oldY ) then
                   if Not NotifyDestinationReached  then Exit;
 
-    (* se reach è 80% o diversa da 0, calcolo se è arrivato *)
+    (* If ReachPerc is nonzero, check whether the partial destination was reached. *)
     if FMoverData.reachPerc <> 0 then begin
       if ( PositionX = FMoverData.fDestinationXreach ) and ( PositionY = FMoverData.fDestinationYreach ) then begin
     //          if Not NotifyDestinationReached then Exit;
@@ -2456,7 +2371,7 @@ procedure TSprite.SetAngle(const Value: single);
 var
   a: single;
 begin
-//  FAngle := -Value+90;    // <-- dipende da come è girato lo sprite in partenza
+//  FAngle := -Value+90;    // Depends on the sprite's original orientation.
   a := Value;
   while a < 0 do
     a := a + 360;
@@ -2581,7 +2496,7 @@ begin
         SetLength(CollisionArray, FTheater.VirtualWidth , FTheater.VirtualHeight);
 
 
-        // qui sotto va come concetto ma non è performante.controllare sotto l'albero e poi ha smnesso di andare-
+        // The approach below is conceptually valid but not performant.
         for y := FrameHeight -1 downto 0 do begin
        //   ppRGB := PRGB (lstSprites[i].FBMPCurrentFrame.fbitmapScanlines [y]);
           for x := FrameWidth -1 downto 0 do begin
@@ -2717,7 +2632,7 @@ begin
 
         if AnimationDirection = dirForward then  begin
           Inc( FFrameX );
-          if FFrameX > FFrameXMax -1 then begin   // <--- >= può saltare 1 frame e trovarsi a 358
+          if FFrameX > FFrameXMax -1 then begin   // >= can skip one frame at the upper boundary.
            FFrameX := FramexMin;
          //  FFrameY := FFrameY + 1;
         //   if FFrameY > FramesY -1 then
@@ -2785,7 +2700,7 @@ begin
      // reset
      if FFrameX > FFrameXMax -1 then
       FFrameX := FFrameXmin;
-   //goto Myexit;   // <-- col cambio di bitmap può trovarsi oltre
+   //goto Myexit;   // A bitmap change can leave the frame outside the valid range.
    if not useBmpDimension then begin
     // FrameWidth := FBMP.Width div FramesX;
     // FrameHeight := FBMP.height div FramesY;
@@ -2822,14 +2737,6 @@ begin
     fBmpCurrentFrameAlpha.Rotate (-fAngle);
   end;
 
-  if SpriteFileName = 'TPolygon'  then begin
-    if  TSpritePolygon(Self).oldAngle <> fAngle then begin
-      TSpritePolygon(Self).Rotate(Trunc(fAngle) );
-      TSpritePolygon(Self).oldAngle := fAngle;
-    end;
-
-  end;
-
   // qui Scale
   //if fGrayscaled then fBmpCurrentFrame.GrayScale ;
 
@@ -2850,13 +2757,13 @@ var
   i,y,X: integer;
   wTrans: dword;
   aTrgb: Trgb;
-  diff,textwidth,diffx,diffy,TextHeight: Integer;
   DestBitmap: TSpriteBitmap;
   NewWidth, NewHeight : Integer;
   R :Trect;
 begin
 
   WaitForSingleObject(  MutexProcess, INFINITE);
+  wTrans := 0;
   if RenderTo = VisibleRender then
     DestBitmap:= Theater.VisibleBitmap else
       DestBitmap := Theater.fvirtualBitmap;
@@ -2919,57 +2826,6 @@ begin
 
   end;
 
-  if SpriteFileName = 'TProgressBar'  then begin
-     // fBMPCurrentFrame.Canvas.Brush.Style := bsSolid;
-      fBMPCurrentFrame.Canvas.Brush.Color := TSpriteProgressBar(Self).BackColor;
-      fBMPCurrentFrame.Canvas.FillRect( Rect(0,0,fBMPCurrentFrame.Width,fBMPCurrentFrame.Height ) );
-      fBMPCurrentFrame.Canvas.Brush.Color := TSpriteProgressBar(Self).BarColor;
-      fBMPCurrentFrame.Canvas.FillRect( Rect(0,0, ( TSpriteProgressBar(Self).Value* fBMPCurrentFrame.Width ) div 100 ,fBMPCurrentFrame.Height));
-
-      fBMPCurrentFrame.Canvas.Font.Name := ( TSpriteProgressBar(Self).lFontName );
-      fBMPCurrentFrame.Canvas.Font.Color := TSpriteProgressBar(Self).lFontColor;
-      fBMPCurrentFrame.Canvas.Font.Size := TSpriteProgressBar(Self).lFontSize;
-      //fBMPCurrentFrame.Canvas.Brush.Style := bsClear;
-      fBMPCurrentFrame.Canvas.Font.Quality :=  TSpriteProgressBar(Self).lFontQuality;
-
-      R.Left := 0;
-      R.Top := 0;
-      R.Right :=  fBMPCurrentFrame.Bitmap.Width;
-      R.Bottom := fBMPCurrentFrame.Bitmap.height;
-
-
-      SetBkMode(fBMPCurrentFrame.Canvas.Handle,1); // 1= transparent
-      if TSpriteProgressBar(Self).pbHAlignment = 7 then begin // 7 a X a destra    // right della barra colorata (value)
-        textWidth := fBMPCurrentFrame.Canvas.TextWidth(TSpriteProgressBar(Self).Text);
-        R.Right := ( TSpriteProgressBar(Self).Value* fBMPCurrentFrame.Width ) div 100;
-        R.Left := R.Right - textwidth;
-        DrawText(fBMPCurrentFrame.Canvas.handle, PChar(TSpriteProgressBar(Self).Text), length(TSpriteProgressBar(Self).Text), R, dt_wordbreak or DT_RIGHT  );
-      end
-      else // left, right ,center normali
-        DrawText(fBMPCurrentFrame.Canvas.handle, PChar(TSpriteProgressBar(Self).text), length(TSpriteProgressBar(Self).Text), R, TSpriteProgressBar(Self).pbHAlignment or TSpriteProgressBar(Self).pbVAlignment );
-
-  end
-  else if SpriteFileName = 'TPolygon'  then begin
-    fBMPCurrentFrame.Canvas.Pen.Color := TSpritePolygon(Self).VertexColor;
-    fBMPCurrentFrame.Canvas.Brush.Color := TSpritePolygon(Self).FillColor;
-
-    if TSpritePolygon(Self).Filled then begin
-      fBMPCurrentFrame.Canvas.Brush.Style := bsSolid;
-      fBMPCurrentFrame.Canvas.Polygon(TSpritePolygon(Self).arPointVisual);
-    end
-    else begin
-      fBMPCurrentFrame.Canvas.MoveTo(TSpritePolygon(Self).arPoint[0].X + (fBMPCurrentFrame.Width div 2),TSpritePolygon(Self).arPoint[0].Y + (fBMPCurrentFrame.Height div 2));
-      for I := 1 to High(TSpritePolygon(Self).arPoint) do begin
-        fBMPCurrentFrame.Canvas.LineTo(TSpritePolygon(Self).arPoint[i].X + (fBMPCurrentFrame.Width div 2),TSpritePolygon(Self).arPoint[i].Y + (fBMPCurrentFrame.Height div 2));
-      end;
-      fBMPCurrentFrame.Canvas.LineTo(TSpritePolygon(Self).arPoint[0].X + (fBMPCurrentFrame.Width div 2),TSpritePolygon(Self).arPoint[0].Y + (fBMPCurrentFrame.Height div 2));
-    end;
-    //Transparent := False;
-    fTransparentForced := True;
-    wTrans := clwhite;
-  end;
-
-
   if Transparent then begin
 
      if fTransparentForced  then begin
@@ -3023,236 +2879,6 @@ begin
     end;
   end;
 end;
-constructor TSpriteProgressBar.Create ( const guid: string; x,y,w,h: integer; aFontName: string; aFontColor, aBarColor, aBackColor: TColor; aFontSize: Integer; aText: string; aValue: integer; aTransparent: boolean );
-var
-rectSource: TRect;
-begin
-  ProgressBar := True;
-  Destinationreached := true;
-  FAnimated := false ;
-  Self.Guid:= Guid;
-  FMoverData:= TSpriteMoverData.Create;
-  FMoverData.FSprite := self;
-  FPositionX:= X;
-  FPositionY:= Y;
-
-  Text := aText;
-  lFontName := aFontName;
-  lFontColor := aFontColor;
-  lFontSize := aFontSize;
-//  lBrushStyle := bsclear; // default;
-  lFontQuality := fqAntialiased; // default
-
-  fpause    :=false;
-
-  FramesX  := 1;
-  FramesY  := 1;
-  FrameXMin  := 0;
-  FrameXMax  := 0;
-  FAnimationInterval := 1000;
-  fDelay:=0;
-
-  BarColor := aBarColor;
-
-
-  FBMP:= TSpriteBitmap.Create( w, h );
-  FBMP.Canvas.Brush.Style := bsSolid;
-  FBMP.Canvas.Brush.Color := Barcolor;
-  FBMP.Canvas.FillRect( Rect(0,0,w,h) );
-  //  FBMP.Assign(bmp);
-  inherited create ( FBMP.Bitmap, guid, 1,1,1000,x,y, aTransparent) ;
-  SpriteFileName:= 'TProgressBar';
-
-
-  FBMPCurrentFrame:=TSpriteBitmap.Create (FBMP.Width div FramesX , FBMP.height div FramesY );
-
-  FBMPalpha :=  TSpriteBitmap.Create(FBMP.Width,FBMP.Height);   // crea un bmp alpha comunque
-  FBMPCurrentFramealpha :=  TSpriteBitmap.Create(FBMPCurrentFrame.Width,FBMPCurrentFrame.Height);   // crea un bmp alpha comunque
-
-  fBmp.fbitmapAlpha := FBMPalpha.Bitmap ;
-  fBmpCurrentFrame.fbitmapAlpha := FBMPCurrentFrameAlpha.Bitmap ;
-
-  //glielo devo passare già tagliato e poi andrà bene
-    with rectSource do begin
-      Left := 0;
-      Top := 0;
-      Right := ( FBMP.Width div FramesX)-1;
-      Bottom :=( FBMP.Height div FramesY)-1;
-    end;
-
-
-  FBMPCurrentFrame.Bitmap.PixelFormat :=  pf24bit;
-
-  FBMP.CopyRectTo(fBMPCurrentFrame,RectSource.left,RectSource.top,0,0,RectSource.Width+1,RectSource.Height+1,false  , 0 ) ;  //irargb
-
-  FFrameWidth := FBMPCurrentFrame.Width;
-  FFrameHeight := FBMPCurrentFrame.height;
-
-  FOnDestinationReached := iOnDestinationReached ;
-  FOnDestinationReachedPerc := iOnDestinationReachedPerc ;
-  FOnPartialMoveReached := iOnPartialMoveReached ;
-
-
-  Transparent := aTransparent;
-
-
-end;
-destructor TSpriteProgressBar.Destroy; //--> distrugge la spriteLabel, poi inherited
-begin
-  inherited;
-end;
-constructor TSpritePolygon.create ( const guid: string; x,y, vertexColor,FillColor: integer; Vertices: string; Filled: boolean; Priority: integer );
-var
-  aPoint : TPoint;
-  ts : TStringList;
-  i: Integer;
-  rectSource,aRect : TRect;
-begin
-
-  ts := TStringList.Create;
-  ts.CommaText := Vertices;
-
-  SetLength( arPoint, ts.Count );
-  SetLength( arPointOriginal, ts.Count );
-  SetLength( arPointVisual, ts.Count );
-  for I := Low ( arPoint) to High( arPoint)  do begin
-    aPoint.X :=  StrToInt( ExtractWordL  ( 1,ts[i],'.' ));
-    aPoint.Y :=  StrToInt( ExtractWordL  ( 2,ts[i],'.' ));
-    arPoint[i] := Point(aPoint.X,aPoint.Y  );
-    arPointOriginal[i]:= Point(aPoint.X,aPoint.Y  );
-  end;
-  ARect := GetSizeFromPolygon;
-  if ARect.Width = 0 then
-    ARect.Width := 1;
-  if ARect.height = 0 then
-    ARect.height := 1;
-
-  for I := Low ( arPoint) to High( arPoint)  do begin
-    arPointVisual[i]:= Point(arPoint[i].X + aRect.Width div 2,arPoint[i].Y + aRect.Height div 2);
-  end;
-
-  Polygon := True;
-  Self.VertexColor := VertexColor;
-  Self.FillColor := FillColor;
-  Self.Filled := Filled;
-
-
-  Destinationreached := true;
-  FAnimated := false ;
-  Self.Guid:= Guid;
-  FMoverData:= TSpriteMoverData.Create;
-  FMoverData.FSprite := self;
-  FPositionX:= X;
-  FPositionY:= Y;
-  //FMoverData.Destination := Point(X,Y);
-  fpause    :=false;
-
-  FramesX  := 1;
-  FramesY  := 1;
-  FrameXMin  := 0;
-  FrameXMax  := 0;
-  FAnimationInterval := 1000;
-  fDelay:=0;
-
-
-  FBMP:= TSpriteBitmap.Create( aRect.Width , aRect.Height );
-//  FBMP.Canvas.Brush.Style := bsSolid;
-//  FBMP.Canvas.Brush.Color := Barcolor;
-  FBMP.Canvas.FillRect( Rect(0,0,aRect.Width , aRect.Height) );
-  //  FBMP.Assign(bmp);
-  inherited create ( FBMP.Bitmap, guid, 1,1,1000,x,y, true) ;
-  SpriteFileName:= 'TPolygon';
-
-
-  FBMPCurrentFrame:=TSpriteBitmap.Create (FBMP.Width div FramesX , FBMP.height div FramesY );
-
-  FBMPalpha :=  TSpriteBitmap.Create(FBMP.Width,FBMP.Height);   // crea un bmp alpha comunque
-  FBMPCurrentFramealpha :=  TSpriteBitmap.Create(FBMPCurrentFrame.Width,FBMPCurrentFrame.Height);   // crea un bmp alpha comunque
-
-  fBmp.fbitmapAlpha := FBMPalpha.Bitmap ;
-  fBmpCurrentFrame.fbitmapAlpha := FBMPCurrentFrameAlpha.Bitmap ;
-
-  //glielo devo passare già tagliato e poi andrà bene
-    with rectSource do begin
-      Left := 0;
-      Top := 0;
-      Right := ( FBMP.Width div FramesX)-1;
-      Bottom :=( FBMP.Height div FramesY)-1;
-    end;
-
-
-  FBMPCurrentFrame.Bitmap.PixelFormat :=  pf24bit;
-
-  FBMP.CopyRectTo(fBMPCurrentFrame,RectSource.left,RectSource.top,0,0,RectSource.Width+1,RectSource.Height+1,false  , 0 ) ;  //irargb
-
-  FFrameWidth := FBMPCurrentFrame.Width;
-  FFrameHeight := FBMPCurrentFrame.height;
-
-  FOnDestinationReached := iOnDestinationReached ;
-  FOnDestinationReachedPerc := iOnDestinationReachedPerc ;
-  FOnPartialMoveReached := iOnPartialMoveReached ;
-
-
-  Transparent := true;
-
-
-
-end;
-destructor TSpritePolygon.destroy;
-begin
-
-  inherited;
-end;
-function TSpritePolygon.GetSizeFromPolygon: TRect;
-var
-  i: integer;
-begin
-
-  Result.Left := High( integer );
-  Result.Right := Low( integer );
-  Result.Top := High( integer );
-  Result.Bottom := Low( integer );
-  for i := Low (arPoint) to High (arPoint) do  begin
-    if arPoint[i].X < Result.Left then
-      Result.Left := arPoint[i].X;
-    if arPoint[i].Y < Result.Top then
-      Result.Top := arPoint[i].Y;
-    if arPoint[i].X > Result.Right then
-      Result.Right := arPoint[i].X;
-    if arPoint[i].Y > Result.Bottom then
-      Result.Bottom := arPoint[i].Y;
-  end;
-
-//  Result.Width := Result.Width + 1;
-//  Result.Height:= Result.Height + 1;
-
-
-
-end;
-procedure TSpritePolygon.Rotate(Degrees: integer);
-var
-  xSin, xCos: single;
-  i: integer;
-  x, y: integer;
-begin
-  xSin := arSin[Degrees];
-  xCos := arCos[Degrees];
-
-  for i := Low (arPoint) to High (arPoint) do  begin
-    arPoint[i] := arPointOriginal[i];
-  end;
-
-  for i := Low (arPoint) to High (arPoint) do  begin
-    x := Round( arPoint[i].X * xCos - arPoint[i].Y * xSin );
-    y := Round( arPoint[i].Y * xCos + arPoint[i].X * xSin );
-    arPoint[i] := Point( x, y );
-  end;
-  for i := Low (arPoint) to High (arPoint) do  begin
-    arPointVisual[i]:= Point(arPoint[i].X + FBMPCurrentFrame.Width div 2,arPoint[i].Y + FBMPCurrentFrame.Height div 2);
-  end;
-
-end;
-
 constructor TTheater.Create(Owner: TComponent);
 begin
 
@@ -3591,7 +3217,7 @@ begin
     fPaintWidth := imin(ZoomWidth, Width);
     fPaintHeight := imin(ZoomHeight, Height);
 
-    // se ho zoommato molto IN l'immagine è più piccola. Devo spsostare l'offset fino a centrare l'immagine
+    // When zoomed in heavily, move the offset until the image is centered.
     // il BackColor riempe lo spazio irrisolto.
     if (fPaintWidth < Width) then
         fOffsetX := (Width - fPaintWidth) div 2;
@@ -3986,7 +3612,7 @@ procedure TTheater.FinalPaint(ABitmap: TSpriteBitmap; ABitmapScanline: ppointera
 var
   Rotated: TSpriteBitmap;
 begin
-// Questo è il render su fVisibleBitmap calcolando lo zoom o lo scrolling
+// Render to fVisibleBitmap while applying zoom and scrolling.
 // Prima devo calcolare le dimensione e dove mettere nel canvas finale
   GetPaintCoords(VirtualSource1x, VirtualSource1y, VirtualSourceWidth, VirtualSourceHeight, fDstX, fDstY, fViewX, fViewY);
 
@@ -3996,7 +3622,7 @@ begin
   aBitmap.Canvas.Brush.Style := bsSolid;
   aBitmap.Canvas.FillRect(rect(0, 0, Width , Height ));
 
-// Questo è il render finale
+// Final render.
   //Angle:= 45;
   if Angle <> 0 then begin
     Rotated := fVirtualBitmap.Rotate(Angle);
@@ -4024,8 +3650,3 @@ finalization
 
 
 end.
-
-
-
-
-

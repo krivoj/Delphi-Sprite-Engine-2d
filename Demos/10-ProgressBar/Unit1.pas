@@ -4,7 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SpriteEngine.Core, Vcl.ExtCtrls, Vcl.StdCtrls, System.Generics.Collections ,System.Generics.Defaults;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SpriteEngine.Core, SpriteEngine.Controls,
+  Vcl.ExtCtrls, Vcl.StdCtrls, System.Generics.Collections, System.Generics.Defaults;
 
 type
   TForm1 = class(TForm)
@@ -22,7 +23,7 @@ type
 
 var
   Form1: TForm1;
-  aSpriteProgressBar: TSpriteProgressBar;
+  HealthBar: TSpriteProgressBar;
 implementation
 
 {$R *.dfm}
@@ -49,8 +50,13 @@ begin
   CharacterEngine.CreateSprite('..\!media\gabriel_IDLE.1.bmp','gabriel',{framesX}15,{framesY}1,{Delay}5,{X}100,{Y}100,{transparent}true,1);
   CharacterEngine.CreateSprite('..\!media\shahira_IDLE.1.bmp','shahira',{framesX}15,{framesY}1,{Delay}5,{X}200,{Y}100,{transparent}true,1);
 
-  aSpriteProgressBar:= CharacterEngine.CreateSpriteProgressBar('myprogressbar',200,200,300,32,'Calibri',clWhite-1,clRed,clBlue,14,'50', 50,true ,10);
-  aSpriteProgressBar.pbHAlignment := DT_RIGHT;
+  HealthBar := CharacterEngine.CreateProgressBar('health', 200, 200, 300, 36, 10);
+  HealthBar.Caption := 'HEALTH';
+  HealthBar.Value := 50;
+  HealthBar.Theme := ctRPG;
+  HealthBar.FillColor := clRed;
+  HealthBar.FontName := 'Calibri';
+  HealthBar.FontSize := 14;
 
 end;
 
@@ -59,8 +65,7 @@ var
   aRnd :  Integer;
 begin
   aRnd := Random(100 );
-  aSpriteProgressBar.Value := aRnd;
-  aSpriteProgressBar.Text := IntToStr(aRnd);
+  HealthBar.Value := aRnd;
 end;
 
 end.

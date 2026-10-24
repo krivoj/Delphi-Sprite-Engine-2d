@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,System.Math,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SpriteEngine.Core, Vcl.ExtCtrls, Vcl.StdCtrls, System.Generics.Collections ,System.Generics.Defaults, SpriteEngine.Bitmap,
-  SpriteEngine.Timer;
+  SpriteEngine.Timer, SpriteEngine.Controls;
 
 type
   TForm1 = class(TForm)
@@ -40,7 +40,10 @@ begin
   SpriteEngine1.Priority := 1;
 
 
-  Ship := SpriteEngine1.CreateSpritePolygon ('ship', Theater1.Width div 2, Theater1.Height div 2, claqua,clBlue, '0.-10,8.10,0.5,-8.10',False,1 );
+  Ship := SpriteEngine1.CreatePolygon('ship', Theater1.VirtualWidth div 2,
+    Theater1.VirtualHeight div 2, '0.-10,8.10,0.5,-8.10', 1);
+  Ship.BorderColor := clAqua;
+  Ship.FillColor := clBlue;
   Ship.TransparentColor := clWhite;
   Ship.Filled := True;
 
@@ -49,7 +52,10 @@ begin
   Ship.MoverData.MoveModeThrust_Friction := 0.1;
   Ship.MoverData.MoveModeThrust_MaximumSpeed := 8;
 
-  ShipFire := SpriteEngine1.CreateSpritePolygon ('shipfire', Theater1.Width div 2, Theater1.Height div 2, clRed,clYellow,'0.0,4.8,0.13,-4.8',False,1 );
+  ShipFire := SpriteEngine1.CreatePolygon('shipfire', Theater1.VirtualWidth div 2,
+    Theater1.VirtualHeight div 2, '0.0,4.8,0.13,-4.8', 1);
+  ShipFire.BorderColor := clRed;
+  ShipFire.FillColor := clYellow;
   ShipFire.TransparentColor := clWhite;
 
   ShipFire.MoverData.MoveMode := Thrust;
