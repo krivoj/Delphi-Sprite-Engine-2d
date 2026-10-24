@@ -1,0 +1,60 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'SE-SpriteMove- Thrust Bmp'
+  ClientHeight = 722
+  ClientWidth = 1031
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  KeyPreview = True
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnCreate = FormCreate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Theater1: TTheater
+    Left = -1
+    Top = 0
+    Width = 1024
+    Height = 600
+    Align = alClient
+    MouseScrollRate = 1.000000000000000000
+    MouseWheelInvert = False
+    MouseWheelValue = 10
+    MouseWheelZoom = True
+    MousePan = True
+    MouseScroll = False
+    BackColor = clBlack
+    AnimationInterval = 20
+    CollisionDelay = 0
+    ShowPerformance = False
+    OnAfterVisibleRender = Theater1AfterVisibleRender
+    WrapHorizontal = True
+    WrapVertical = True
+    VirtualWidth = 1200
+    Virtualheight = 1920
+    TabOrder = 0
+  end
+  object BackgroundEngine: TSpriteEngine
+    HitTest = False
+    PixelCollision = False
+    IsoPriority = False
+    Priority = 0
+    Theater = Theater1
+    Left = 280
+    Top = 656
+  end
+  object SpriteEngine1: TSpriteEngine
+    HitTest = False
+    PixelCollision = True
+    IsoPriority = False
+    Priority = 1
+    Theater = Theater1
+    Left = 520
+    Top = 656
+  end
+end

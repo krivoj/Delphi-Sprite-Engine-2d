@@ -1,0 +1,49 @@
+package SpriteEngine;
+
+{$R *.res}
+{$R 'SpriteEngine.dcr'}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  vcl;
+
+contains
+  SpriteEngine.Core in 'SpriteEngine.Core.pas',
+  SpriteEngine.Bitmap in 'SpriteEngine.Bitmap.pas',
+  SpriteEngine.Utils in 'SpriteEngine.Utils.pas',
+  SpriteEngine.Timer in 'SpriteEngine.Timer.pas',
+  SpriteEngine.Types in 'SpriteEngine.Types.pas',
+  SpriteEngine.Collections in 'SpriteEngine.Collections.pas',
+  SpriteEngine.PathPlanner in 'SpriteEngine.PathPlanner.pas',
+  SpriteEngine.FileSearch in 'SpriteEngine.FileSearch.pas',
+  SpriteEngine.Random in 'SpriteEngine.Random.pas',
+  SpriteEngine.Panel in 'SpriteEngine.Panel.pas';
+
+end.
+
+

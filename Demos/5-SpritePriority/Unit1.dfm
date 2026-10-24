@@ -1,0 +1,198 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'SE-SpritePriority'
+  ClientHeight = 722
+  ClientWidth = 1032
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnCreate = FormCreate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Label3: TLabel
+    Left = 200
+    Top = 616
+    Width = 249
+    Height = 19
+    Caption = 'CharacterEngine.IsoPriority := True;'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object Label4: TLabel
+    Left = 200
+    Top = 641
+    Width = 220
+    Height = 19
+    Caption = 'SpriteTree.ModPriority := 170;'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object Theater1: TTheater
+    Left = 0
+    Top = 5
+    Width = 1024
+    Height = 600
+    Align = alClient
+    MouseScrollRate = 1.000000000000000000
+    MouseWheelInvert = False
+    MouseWheelValue = 10
+    MouseWheelZoom = True
+    MousePan = True
+    MouseScroll = False
+    BackColor = clBlack
+    AnimationInterval = 20
+    CollisionDelay = 0
+    ShowPerformance = False
+    OnBeforeVisibleRender = Theater1BeforeVisibleRender
+    WrapHorizontal = False
+    WrapVertical = False
+    VirtualWidth = 1200
+    Virtualheight = 1920
+    TabOrder = 0
+  end
+  object Panel1: TPanel
+    Left = 647
+    Top = 611
+    Width = 185
+    Height = 97
+    Alignment = taLeftJustify
+    Caption = 'Scroll'
+    TabOrder = 1
+    VerticalAlignment = taAlignTop
+    object Label1: TLabel
+      Left = 16
+      Top = 70
+      Width = 89
+      Height = 13
+      AutoSize = False
+      Caption = 'MouseScrollRate'
+    end
+    object CheckBox1: TCheckBox
+      Left = -1
+      Top = 24
+      Width = 97
+      Height = 17
+      Caption = 'MousePan'
+      Checked = True
+      State = cbChecked
+      TabOrder = 0
+      OnClick = CheckBox1Click
+    end
+    object CheckBox2: TCheckBox
+      Left = -1
+      Top = 47
+      Width = 97
+      Height = 17
+      Caption = 'MouseScroll'
+      TabOrder = 1
+      OnClick = CheckBox2Click
+    end
+    object Edit1: TEdit
+      Left = 102
+      Top = 67
+      Width = 34
+      Height = 21
+      NumbersOnly = True
+      TabOrder = 2
+      Text = '1.00'
+      OnChange = Edit1Change
+    end
+  end
+  object Panel2: TPanel
+    Left = 839
+    Top = 611
+    Width = 185
+    Height = 97
+    Alignment = taLeftJustify
+    Caption = 'Zoom'
+    TabOrder = 2
+    VerticalAlignment = taAlignTop
+    object Label2: TLabel
+      Left = 16
+      Top = 70
+      Width = 89
+      Height = 13
+      AutoSize = False
+      Caption = 'MouseWheelValue'
+    end
+    object CheckBox3: TCheckBox
+      Left = -1
+      Top = 24
+      Width = 97
+      Height = 17
+      Caption = 'MouseWheelZoom'
+      Checked = True
+      State = cbChecked
+      TabOrder = 0
+      OnClick = CheckBox3Click
+    end
+    object CheckBox4: TCheckBox
+      Left = -1
+      Top = 47
+      Width = 97
+      Height = 17
+      Caption = 'Invert Wheel'
+      TabOrder = 1
+      OnClick = CheckBox4Click
+    end
+    object Edit2: TEdit
+      Left = 102
+      Top = 67
+      Width = 34
+      Height = 21
+      NumbersOnly = True
+      TabOrder = 2
+      Text = '10'
+      OnChange = Edit2Change
+    end
+  end
+  object Button1: TButton
+    Left = 520
+    Top = 616
+    Width = 105
+    Height = 25
+    Caption = 'build random Path'
+    TabOrder = 3
+    OnClick = Button1Click
+  end
+  object BackgroundEngine: TSpriteEngine
+    HitTest = False
+    PixelCollision = False
+    IsoPriority = False
+    Priority = 0
+    Theater = Theater1
+    Left = 280
+    Top = 656
+  end
+  object CharacterEngine: TSpriteEngine
+    PixelCollision = False
+    IsoPriority = True
+    Priority = 1
+    Theater = Theater1
+    OnSpriteDestinationReached = CharacterEngineSpriteDestinationReached
+    Left = 520
+    Top = 656
+  end
+  object ThreadTimer1: TThreadTimer
+    Enabled = True
+    Interval = 300
+    KeepAlive = True
+    OnTimer = ThreadTimer1Timer
+    Left = 408
+    Top = 656
+  end
+end

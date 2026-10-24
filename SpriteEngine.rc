@@ -1,0 +1,3 @@
+TTheater BITMAP "TTheater.bmp"
+TSpriteEngine BITMAP "TSpriteEngine.bmp"
+TThreadTimer BITMAP "TThreadTimer.bmp"

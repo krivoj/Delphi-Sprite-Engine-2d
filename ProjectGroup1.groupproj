@@ -1,0 +1,36 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{E045F478-7021-4527-BE38-0B6143377FC2}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="SpriteEngine.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="SpriteEngine">
+        <MSBuild Projects="SpriteEngine.dproj"/>
+    </Target>
+    <Target Name="SpriteEngine:Clean">
+        <MSBuild Projects="SpriteEngine.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SpriteEngine:Make">
+        <MSBuild Projects="SpriteEngine.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="SpriteEngine"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="SpriteEngine:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="SpriteEngine:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
