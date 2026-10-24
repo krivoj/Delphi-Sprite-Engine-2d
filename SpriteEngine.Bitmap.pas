@@ -1,4 +1,4 @@
-unit SpriteEngine.Bitmap;
+ï»¿unit SpriteEngine.Bitmap;
 
 interface
 
@@ -869,21 +869,19 @@ end;
 procedure TSpriteBitmap.CopyRectTo(DestBitmap: TSpriteBitmap; SrcX, SrcY, DstX, DstY: integer; RectWidth, RectHeight: integer; Transparent: boolean;wTrans: integer);
 var
   y,x: integer;
-  ps, pd: pbyte;
+  ps, pd: PRGB;
   rl: integer;
   ppRGBCurrentFrame,ppVirtualRGB,ppRGBCurrentFrameAlpha: pRGB;
   aTrgb: Trgb;
-  label skip;
+  TransBG, PixelBG: Word;
 
 
 begin
 
   if Transparent then begin
 
-     aTRGB:= SpriteEngine.Utils.TColor2TRGB (wtrans);
-
-    SrcX:=0;  // arbitrario
-    SrcY:=0;
+    aTRGB := SpriteEngine.Utils.TColor2TRGB(wtrans);
+    TransBG := PWord(@aTRGB)^;
    // DstX:= DrawingRect.Left ;
    // DstY:= DrawingRect.Top;
 
@@ -922,6 +920,23 @@ begin
     if DstY + RectHeight > DestBitmap.Height then
       RectHeight := DestBitmap.Height - DstY;
 
+    { Fast path used by ordinary color-key sprites: no method call and no
+      alpha/blend branch inside the pixel loop. }
+    if (fAlpha = 0) and (BlendMode = bmNormal) then begin
+      for y := 0 to RectHeight - 1 do begin
+        ps := GetSegment(SrcY + y, SrcX, RectWidth);
+        pd := DestBitmap.GetSegment(DstY + y, DstX, RectWidth);
+        for x := 0 to RectWidth - 1 do begin
+          PixelBG := PWord(ps)^;
+          if (PixelBG <> TransBG) or (ps^.r <> aTRGB.r) then
+            pd^ := ps^;
+          Inc(ps);
+          Inc(pd);
+        end;
+      end;
+      Exit;
+    end;
+
     for y := 0 to RectHeight - 1 do begin
       ppRGBCurrentFrame := GetSegment(SrcY + y, SrcX, RectWidth);
 
@@ -933,20 +948,19 @@ begin
       ppVirtualRGB := DestBitmap.GetSegment(DstY + y, DstX, RectWidth);
       for x := SrcX to SrcX + RectWidth - 1 do begin
 //        if not((ppRGBCurrentFrame.b = aTRGB.b) and (ppRGBCurrentFrame.g = aTRGB.g) and (ppRGBCurrentFrame.r = aTRGB.r)) then begin
-        if (ppRGBCurrentFrame.b <> aTRGB.b) or (ppRGBCurrentFrame.g <> aTRGB.g) or (ppRGBCurrentFrame.r <> aTRGB.r) then begin
+        PixelBG := PWord(ppRGBCurrentFrame)^;
+        if (PixelBG <> TransBG) or (ppRGBCurrentFrame.r <> aTRGB.r) then begin
           if fAlpha <> 0 then begin
             if (ppRGBCurrentFrameAlpha.B <> 255) and (ppRGBCurrentFrameAlpha.G <> 255) and (ppRGBCurrentFrameAlpha.R <> 255)  then begin
-          // se non è 0 in alpha
+          // se non Ã¨ 0 in alpha
 //              Blend ( ppRGBCurrentFrame,ppVirtualRGB,bmAlpha,0); ;  // trovare alpha   AND ????
               Blend ( ppRGBCurrentFrame,ppVirtualRGB,bmAlpha,ppRGBCurrentFrameAlpha ); ;  // trovare alpha  AND ????
 
 
             end
-            else begin   // se è 0 in alpha
+            else begin   // se Ã¨ 0 in alpha
               if BlendMode = bmNormal then begin
-                ppVirtualRGB.b := ppRGBCurrentFrame.b;
-                ppVirtualRGB.g:= ppRGBCurrentFrame.g;
-                ppVirtualRGB.r:= ppRGBCurrentFrame.r;
+                ppVirtualRGB^ := ppRGBCurrentFrame^;
               end
               else begin
                 Blend ( ppRGBCurrentFrame,ppVirtualRGB,BlendMode,ppRGBCurrentFrame); ;
@@ -955,16 +969,13 @@ begin
           end
           else begin
               if BlendMode = bmNormal then begin
-                ppVirtualRGB.b := ppRGBCurrentFrame.b;
-                ppVirtualRGB.g:= ppRGBCurrentFrame.g;
-                ppVirtualRGB.r:= ppRGBCurrentFrame.r;
+                ppVirtualRGB^ := ppRGBCurrentFrame^;
               end
               else begin
                 Blend ( ppRGBCurrentFrame,ppVirtualRGB,BlendMode,ppRGBCurrentFrame); ;
               end;
           end;
         end;
-        SKIP:
         if fAlpha <> 0 then inc(pbyte(ppRGBCurrentFrameAlpha),3);
         inc(pbyte(ppRGBCurrentFrame),3);
         inc(pbyte(ppVirtualRGB),3);
@@ -1011,34 +1022,24 @@ begin
     RectHeight := DestBitmap.Height - DstY;
 
     // pf24bit
-    rl := (((RectWidth * 24) + 31) shr 5) shl 2; // row byte length
+    // A sub-rectangle has no per-row DIB padding of its own.
+    rl := RectWidth * SizeOf(TRGB);
     if BlendMode = bmNormal then begin
       for y := 0 to RectHeight - 1 do begin
         ps := GetSegment(SrcY + y, SrcX, RectWidth);
         pd := DestBitmap.GetSegment(DstY + y, DstX, RectWidth);
-        CopyMemory(pd, ps, rl);
+        Move(ps^, pd^, rl);
       end;
     end
     else begin
       for y := 0 to RectHeight - 1 do begin
         ppRGBCurrentFrame := GetSegment(SrcY + y, SrcX, RectWidth);
         ppVirtualRGB := DestBitmap.GetSegment(DstY + y, DstX, RectWidth);
-        for x := SrcX to SrcX + RectWidth - 1 do begin
-          if not((ppRGBCurrentFrame.b = aTRGB.b) and (ppRGBCurrentFrame.g = aTRGB.g) and (ppRGBCurrentFrame.r = aTRGB.r)) then begin
-
-            if BlendMode = bmNormal then begin
-              ppVirtualRGB.b := ppRGBCurrentFrame.b;
-              ppVirtualRGB.g:= ppRGBCurrentFrame.g;
-              ppVirtualRGB.r:= ppRGBCurrentFrame.r;
-            end
-            else begin
-
-
-              Blend ( ppRGBCurrentFrame,ppVirtualRGB,BlendMode,ppRGBCurrentFrame); ;
-            end;
-          end;
-          inc(pbyte(ppRGBCurrentFrame),sizeof(TRGB));
-          inc(pbyte(ppVirtualRGB),sizeof(TRGB));
+        for x := 0 to RectWidth - 1 do begin
+          Blend(ppRGBCurrentFrame, ppVirtualRGB, BlendMode,
+            ppRGBCurrentFrame);
+          Inc(ppRGBCurrentFrame);
+          Inc(ppVirtualRGB);
         end;
       end;
     end;
@@ -1061,7 +1062,7 @@ var
   pSource, pDest: pointer;
   nSrcWidth3, nSrcX3, nSrcBlockWidth3, nDestX3, inverter: integer;
 begin
-  // al momento c'è un bug. procedura non utilizzata
+  // al momento c'Ã¨ un bug. procedura non utilizzata
   Inverter:= DestBitmap.Height -1;
 
   pDest := DestBitmap.Memory;//.ScanLine[Theater.fVirtualBitmap.Height -1];
@@ -1227,8 +1228,7 @@ end;
 
 procedure TSpriteBitmap.SetPixel24(x, y: integer; value: TRGB);
 begin
-    Canvas.Pixels [x,y] :=  SpriteEngine.Utils.TRGB2TColor (Value);
-//    Pixel24[x, y] := value;
+  PRGBROW(Scanline[y])^[x] := Value;
 end;
 
 
