@@ -7,7 +7,6 @@ uses
   Vcl.Graphics, SpriteEngine.Core;
 
 type
-  TSpriteControlTheme = (ctCustom, ctRPG, ctSciFi);
   TSpriteButtonState = (bsNormal, bsHover, bsPressed, bsDisabled);
   TSpriteProgressOrientation = (poHorizontal, poVertical);
   TSpritePointArray = array of TPoint;
@@ -26,7 +25,6 @@ type
     FFontStyle: TFontStyles;
     FCornerSize: Integer;
     FPadding: Integer;
-    FTheme: TSpriteControlTheme;
     FDirty: Boolean;
     procedure SetBackgroundColor(const Value: TColor);
     procedure SetBorderColor(const Value: TColor);
@@ -38,7 +36,6 @@ type
     procedure SetFontStyle(const Value: TFontStyles);
     procedure SetCornerSize(const Value: Integer);
     procedure SetPadding(const Value: Integer);
-    procedure SetTheme(const Value: TSpriteControlTheme);
   protected
     procedure Changed;
     procedure PaintControl(const Canvas: TCanvas); virtual;
@@ -48,7 +45,6 @@ type
   public
     constructor Create(const Guid: string; X, Y, Width, Height: Integer); virtual;
     procedure DrawFrame(Interval: Integer); override;
-    procedure ApplyTheme(ATheme: TSpriteControlTheme); virtual;
     property ControlWidth: Integer read FControlWidth;
     property ControlHeight: Integer read FControlHeight;
     property BackgroundColor: TColor read FBackgroundColor write SetBackgroundColor;
@@ -61,7 +57,6 @@ type
     property FontStyle: TFontStyles read FFontStyle write SetFontStyle;
     property CornerSize: Integer read FCornerSize write SetCornerSize;
     property Padding: Integer read FPadding write SetPadding;
-    property Theme: TSpriteControlTheme read FTheme write SetTheme;
   end;
 
   TSpriteProgressBar = class(TSpriteControl)
@@ -84,7 +79,6 @@ type
     procedure PaintControl(const Canvas: TCanvas); override;
   public
     constructor Create(const Guid: string; X, Y, Width, Height: Integer); override;
-    procedure ApplyTheme(ATheme: TSpriteControlTheme); override;
     property Minimum: Integer read FMinimum write SetMinimum;
     property Maximum: Integer read FMaximum write SetMaximum;
     property Value: Integer read FValue write SetValue;
@@ -106,7 +100,6 @@ type
     procedure PaintControl(const Canvas: TCanvas); override;
   public
     constructor Create(const Guid: string; X, Y, Width, Height: Integer); override;
-    procedure ApplyTheme(ATheme: TSpriteControlTheme); override;
     property Title: string read FTitle write SetTitle;
     property HeaderHeight: Integer read FHeaderHeight write SetHeaderHeight;
     property HeaderColor: TColor read FHeaderColor write SetHeaderColor;
@@ -129,7 +122,6 @@ type
     procedure PaintControl(const Canvas: TCanvas); override;
   public
     constructor Create(const Guid: string; X, Y, Width, Height: Integer); override;
-    procedure ApplyTheme(ATheme: TSpriteControlTheme); override;
     procedure Click;
     property Caption: string read FCaption write SetCaption;
     property State: TSpriteButtonState read FState write SetState;
@@ -208,7 +200,12 @@ begin
   FFontSize := 10;
   FFontStyle := [];
   FPadding := 6;
-  ApplyTheme(ctRPG);
+  FBackgroundColor := $001D2633;
+  FBorderColor := $004C7AA3;
+  FAccentColor := $0037B7E5;
+  FTextColor := clWhite;
+  FBorderWidth := 2;
+  FCornerSize := 8;
   FDirty := True;
 end;
 
@@ -230,29 +227,13 @@ end;
 procedure TSpriteControl.PaintBackground(const Canvas: TCanvas);
 var
   R: TRect;
-  Points: array[0..7] of TPoint;
-  C: Integer;
 begin
   R := Rect(0, 0, FControlWidth, FControlHeight);
   Canvas.Brush.Style := bsSolid;
   Canvas.Brush.Color := FBackgroundColor;
   Canvas.Pen.Color := FBorderColor;
   Canvas.Pen.Width := FBorderWidth;
-  if (FTheme = ctSciFi) and (FCornerSize > 0) then
-  begin
-    C := FCornerSize;
-    if C > (FControlHeight div 2) then C := FControlHeight div 2;
-    Points[0] := Point(C, 0);
-    Points[1] := Point(FControlWidth - C - 1, 0);
-    Points[2] := Point(FControlWidth - 1, C);
-    Points[3] := Point(FControlWidth - 1, FControlHeight - C - 1);
-    Points[4] := Point(FControlWidth - C - 1, FControlHeight - 1);
-    Points[5] := Point(C, FControlHeight - 1);
-    Points[6] := Point(0, FControlHeight - C - 1);
-    Points[7] := Point(0, C);
-    Canvas.Polygon(Points);
-  end
-  else if FCornerSize > 0 then
+  if FCornerSize > 0 then
     Canvas.RoundRect(R.Left, R.Top, R.Right, R.Bottom, FCornerSize, FCornerSize)
   else
     Canvas.Rectangle(R);
@@ -279,32 +260,6 @@ begin
     Alignment or DT_VCENTER or DT_SINGLELINE or DT_END_ELLIPSIS);
 end;
 
-procedure TSpriteControl.ApplyTheme(ATheme: TSpriteControlTheme);
-begin
-  FTheme := ATheme;
-  case ATheme of
-    ctRPG:
-      begin
-        FBackgroundColor := $001D2633;
-        FBorderColor := $004C7AA3;
-        FAccentColor := $0037B7E5;
-        FTextColor := clWhite;
-        FBorderWidth := 2;
-        FCornerSize := 8;
-      end;
-    ctSciFi:
-      begin
-        FBackgroundColor := $00201912;
-        FBorderColor := $00D8A632;
-        FAccentColor := $00FFD45A;
-        FTextColor := $00FFF4C7;
-        FBorderWidth := 1;
-        FCornerSize := 10;
-      end;
-  end;
-  Changed;
-end;
-
 procedure TSpriteControl.SetBackgroundColor(const Value: TColor); begin FBackgroundColor := Value; Changed; end;
 procedure TSpriteControl.SetBorderColor(const Value: TColor); begin FBorderColor := Value; Changed; end;
 procedure TSpriteControl.SetBorderWidth(const Value: Integer); begin if Value < 0 then FBorderWidth := 0 else FBorderWidth := Value; Changed; end;
@@ -315,7 +270,6 @@ procedure TSpriteControl.SetFontSize(const Value: Integer); begin FFontSize := V
 procedure TSpriteControl.SetFontStyle(const Value: TFontStyles); begin FFontStyle := Value; Changed; end;
 procedure TSpriteControl.SetCornerSize(const Value: Integer); begin if Value < 0 then FCornerSize := 0 else FCornerSize := Value; Changed; end;
 procedure TSpriteControl.SetPadding(const Value: Integer); begin if Value < 0 then FPadding := 0 else FPadding := Value; Changed; end;
-procedure TSpriteControl.SetTheme(const Value: TSpriteControlTheme); begin ApplyTheme(Value); end;
 
 { TSpriteProgressBar }
 
@@ -328,14 +282,6 @@ begin
   FFillColor := AccentColor;
   FShowValue := True;
   FOrientation := poHorizontal;
-  Changed;
-end;
-
-procedure TSpriteProgressBar.ApplyTheme(ATheme: TSpriteControlTheme);
-begin
-  inherited ApplyTheme(ATheme);
-  if ATheme <> ctCustom then
-    FFillColor := AccentColor;
   Changed;
 end;
 
@@ -391,14 +337,6 @@ begin
   Changed;
 end;
 
-procedure TSpritePanel.ApplyTheme(ATheme: TSpriteControlTheme);
-begin
-  inherited ApplyTheme(ATheme);
-  if ATheme <> ctCustom then
-    FHeaderColor := AccentColor;
-  Changed;
-end;
-
 procedure TSpritePanel.PaintControl(const Canvas: TCanvas);
 var
   H: Integer;
@@ -427,26 +365,6 @@ begin
   FPressedColor := AccentColor;
   FDisabledColor := clGray;
   FState := bsNormal;
-  Changed;
-end;
-
-procedure TSpriteButton.ApplyTheme(ATheme: TSpriteControlTheme);
-begin
-  inherited ApplyTheme(ATheme);
-  case ATheme of
-    ctRPG:
-      begin
-        FHoverColor := $00454F5C;
-        FPressedColor := $0037B7E5;
-        FDisabledColor := $00404040;
-      end;
-    ctSciFi:
-      begin
-        FHoverColor := $00352D1B;
-        FPressedColor := $00D8A632;
-        FDisabledColor := $00303030;
-      end;
-  end;
   Changed;
 end;
 

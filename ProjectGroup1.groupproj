@@ -1,13 +1,13 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{E045F478-7021-4527-BE38-0B6143377FC2}</ProjectGuid>
+        <ProjectGuid>{6C915F55-0F2A-4BBF-B5FE-B0C3D98B3892}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
         <Projects Include="SpriteEngine.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="SpriteEngine.Controls.dproj">
-            <Dependencies>SpriteEngine.dproj</Dependencies>
+            <Dependencies/>
         </Projects>
     </ItemGroup>
     <ProjectExtensions>
@@ -26,23 +26,23 @@
     <Target Name="SpriteEngine:Make">
         <MSBuild Projects="SpriteEngine.dproj" Targets="Make"/>
     </Target>
-    <Target Name="SpriteEngineControls">
+    <Target Name="SpriteEngine_Controls">
         <MSBuild Projects="SpriteEngine.Controls.dproj"/>
     </Target>
-    <Target Name="SpriteEngineControls:Clean">
+    <Target Name="SpriteEngine_Controls:Clean">
         <MSBuild Projects="SpriteEngine.Controls.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="SpriteEngineControls:Make">
+    <Target Name="SpriteEngine_Controls:Make">
         <MSBuild Projects="SpriteEngine.Controls.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="SpriteEngine;SpriteEngineControls"/>
+        <CallTarget Targets="SpriteEngine;SpriteEngine_Controls"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="SpriteEngineControls:Clean;SpriteEngine:Clean"/>
+        <CallTarget Targets="SpriteEngine:Clean;SpriteEngine_Controls:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="SpriteEngine:Make;SpriteEngineControls:Make"/>
+        <CallTarget Targets="SpriteEngine:Make;SpriteEngine_Controls:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

@@ -52,31 +52,33 @@ begin
   Theater1.OnSpriteMouseUp := SpriteMouseUp;
 
   FTargetPanel := ControlsEngine.CreatePanel('target-panel', 340, 220, 420, 260, 1);
-  FTargetPanel.Theme := ctSciFi;
   FTargetPanel.Title := 'TARGET DATA';
+  FTargetPanel.BackgroundColor := $00201912;
+  FTargetPanel.BorderColor := $00D8A632;
+  FTargetPanel.HeaderColor := $00352D1B;
   FTargetPanel.HitTest := False;
 
   FHealthBar := ControlsEngine.CreateProgressBar('health', 340, 180, 360, 34, 3);
-  FHealthBar.Theme := ctRPG;
   FHealthBar.Caption := 'HEALTH';
   FHealthBar.FillColor := $003C55D8;
   FHealthBar.Value := 82;
   FHealthBar.HitTest := False;
 
-  FShieldBar := ControlsEngine.CreateProgressBar('shield', 340, 230, 360, 28, 3);
-  FShieldBar.Theme := ctSciFi;
+  FShieldBar := ControlsEngine.CreateProgressBar('shield', 720, 180, 42, 240, 3);
   FShieldBar.Caption := 'SHIELD';
   FShieldBar.FillColor := $00E7B83F;
+  FShieldBar.Orientation := poVertical;
   FShieldBar.Value := 64;
   FShieldBar.HitTest := False;
 
   FEngageButton := ControlsEngine.CreateButton('engage', 260, 330, 160, 46, 4);
-  FEngageButton.Theme := ctSciFi;
   FEngageButton.Caption := 'ENGAGE TARGET';
+  FEngageButton.BackgroundColor := $00201912;
+  FEngageButton.BorderColor := $00D8A632;
+  FEngageButton.HoverColor := $00352D1B;
   FEngageButton.OnClick := EngageTarget;
 
   FSystemButton := ControlsEngine.CreateButton('system', 440, 330, 160, 46, 4);
-  FSystemButton.Theme := ctRPG;
   FSystemButton.Caption := 'DISABLE SYSTEM';
   FSystemButton.OnClick := ToggleSystem;
 

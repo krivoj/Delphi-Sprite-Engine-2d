@@ -53,7 +53,8 @@ begin
   HealthBar := CharacterEngine.CreateProgressBar('health', 200, 200, 300, 36, 10);
   HealthBar.Caption := 'HEALTH';
   HealthBar.Value := 50;
-  HealthBar.Theme := ctRPG;
+  HealthBar.BackgroundColor := clBlack;
+  HealthBar.BorderColor := clMaroon;
   HealthBar.FillColor := clRed;
   HealthBar.FontName := 'Calibri';
   HealthBar.FontSize := 14;
